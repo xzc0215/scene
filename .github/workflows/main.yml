@@ -2,10 +2,10 @@ name: Build Android Scene (Unsigned)
 
 on:
   push:
-    branches: [ "main", "master" ] # 當推送到主分支時觸發
+    branches: [ "main", "master" ]
   pull_request:
     branches: [ "main", "master" ]
-  workflow_dispatch: # 允許手動觸發構建
+  workflow_dispatch: # 允許手動點擊按鈕執行
 
 jobs:
   build:
@@ -26,10 +26,13 @@ jobs:
         run: chmod +x ./gradlew
 
       - name: 執行 Gradle 構建 (Assemble Debug)
-        run: ./gradlew assembleDebug
+        run: ./gradlew assembleDebug --stacktrace
 
       - name: 整理並上傳構建產物
         uses: actions/upload-artifact@v4
         with:
-          name: Scene-Unsigned-APK
-          path: app/build/outputs/apk/debug/*.apk
+          name: Scene-Build-APKs
+          # 萬用路徑：掃描所有子目錄下的 apk 檔案，解決路徑不匹配問題
+          path: "**/build/outputs/apk/**/*.apk"
+          # 如果檔案不存在，讓 Action 報錯提醒
+          if-no-files-found: error
